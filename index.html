@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Quest World">
+<meta name="theme-color" content="#5B3FE0">
+<title>Quest World</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%235B3FE0'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle'%3E%F0%9F%8F%94%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%235B3FE0'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle'%3E%F0%9F%8F%94%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================= TOKENS ============================= */
+:root{
+  --sky:#3FC5F0;
+  --sky-deep:#1E9BCC;
+  --sun:#FFC93C;
+  --grass:#3FCB78;
+  --coral:#FF6F59;
+  --violet:#6A4CE0;
+  --violet-deep:#4B32B0;
+  --pink:#FF5C9D;
+  --cream:#FFFBF2;
+  --ink:#2C2350;
+  --ink-soft:#5B5480;
+  --white:#ffffff;
+  --common:#9BA3AF;
+  --uncommon:#3FCB78;
+  --rare:#3FC5F0;
+  --epic:#B26AF0;
+  --legendary:#FFC93C;
+  --radius-lg:26px;
+  --radius-md:18px;
+  --radius-sm:12px;
+  --shadow-pop: 0 8px 0 rgba(0,0,0,0.12);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none;}
+html,body{height:100%; overscroll-behavior:none;}
+body{
+  margin:0; font-family:'Nunito',sans-serif; background:var(--cream); color:var(--ink);
+  -webkit-font-smoothing:antialiased; overflow:hidden; position:fixed; inset:0;
+}
+h1,h2,h3,.display{font-family:'Baloo 2',cursive;}
+button{font-family:inherit; border:none; cursor:pointer; -webkit-appearance:none; touch-action:manipulation;}
+input,select,textarea{font-family:inherit; -webkit-appearance:none; border-radius:var(--radius-sm); touch-action:manipulation;}
+::-webkit-scrollbar{display:none;}
+.screen{position:absolute; inset:0; display:none; flex-direction:column; padding-top:var(--safe-top); padding-bottom:var(--safe-bottom); overflow:hidden;}
+.screen.active{display:flex;}
+.scroll{overflow-y:auto; -webkit-overflow-scrolling:touch; flex:1;}
+.hidden{display:none !important;}
+
+/* Buttons */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  font-family:'Baloo 2',cursive; font-weight:700; font-size:17px;
+  padding:14px 22px; border-radius:999px; min-height:52px;
+  background:var(--violet); color:#fff; box-shadow: var(--shadow-pop);
+  transition: transform .06s ease;
+}
+.btn:active{transform: translateY(4px); box-shadow:0 4px 0 rgba(0,0,0,0.12);}
+.btn.sun{background:var(--sun); color:#5b3f00; box-shadow:0 8px 0 #c99a1a;}
+.btn.grass{background:var(--grass); box-shadow:0 8px 0 #279a53;}
+.btn.coral{background:var(--coral); box-shadow:0 8px 0 #cf4c3b;}
+.btn.sky{background:var(--sky); box-shadow:0 8px 0 #157fa8;}
+.btn.ghost{background:#fff; color:var(--violet); border:2px solid #E6E1FA; box-shadow:none;}
+.btn.small{padding:8px 16px; min-height:38px; font-size:14px;}
+.btn.block{width:100%;}
+.btn:disabled{opacity:.45; pointer-events:none;}
+
+.card{background:#fff; border-radius:var(--radius-md); padding:16px; box-shadow:0 3px 0 rgba(44,35,80,0.08);}
+.pill{display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; font-weight:800; font-size:14px;}
+
+input[type=text],input[type=password],input[type=email],input[type=number],select,textarea{
+  width:100%; padding:14px 16px; font-size:16px; border:2px solid #E6E1FA; background:#fff; color:var(--ink);
+}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--violet); border-color:var(--violet);}
+label{font-weight:800; font-size:13px; color:var(--ink-soft); display:block; margin:12px 0 6px;}
+
+/* ============================= LOGIN ============================= */
+#screen-login{background:linear-gradient(160deg,var(--violet) 0%, var(--violet-deep) 60%, #2C2350 100%); align-items:center; justify-content:center; padding:24px;}
+.login-wrap{width:100%; max-width:420px; text-align:center; color:#fff;}
+.login-wrap .logo{font-size:64px; margin-bottom:6px;}
+.login-wrap h1{font-size:34px; margin:0 0 4px; text-shadow:0 3px 0 rgba(0,0,0,0.2);}
+.login-wrap p{opacity:.85; margin:0 0 28px; font-weight:600;}
+.role-cards{display:flex; gap:14px; margin-bottom:10px;}
+.role-card{flex:1; background:rgba(255,255,255,0.12); border:2px solid rgba(255,255,255,0.25); border-radius:var(--radius-lg); padding:22px 10px; color:#fff; font-family:'Baloo 2',cursive; font-weight:700; font-size:16px;}
+.role-card .emoji{font-size:38px; display:block; margin-bottom:8px;}
+.role-card:active{background:rgba(255,255,255,0.25);}
+.auth-panel{background:#fff; border-radius:var(--radius-lg); padding:24px; margin-top:18px; text-align:left; color:var(--ink);}
+.auth-panel h2{margin:0 0 4px; font-size:22px;}
+.auth-panel .sub{color:var(--ink-soft); font-weight:600; font-size:14px; margin-bottom:6px;}
+.link-btn{background:none; color:var(--violet); font-weight:800; text-decoration:underline; font-size:14px; padding:6px;}
+.error-msg{color:var(--coral); font-weight:700; font-size:14px; margin-top:8px; min-height:18px;}
+.kid-picker-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:14px;}
+.kid-picker-item{background:#F4F1FE; border-radius:var(--radius-md); padding:14px 6px; text-align:center; border:3px solid transparent;}
+.kid-picker-item .av{font-size:34px;}
+.kid-picker-item .nm{font-weight:800; font-size:13px; margin-top:6px; color:var(--ink);}
+.kid-picker-item:active{border-color:var(--violet);}
+
+/* ============================= APP SHELL ============================= */
+.app-shell{display:flex; flex-direction:column; height:100%;}
+.topbar{display:flex; align-items:center; justify-content:space-between; padding:14px 18px 10px; flex-shrink:0;}
+.topbar .title{font-size:22px; font-weight:800;}
+.stat-pill{display:flex; align-items:center; gap:6px; background:#fff; border-radius:999px; padding:6px 14px 6px 8px; font-weight:800; box-shadow:0 2px 0 rgba(44,35,80,0.08);}
+.stat-pill .ic{font-size:18px;}
+.hud{display:flex; gap:8px;}
+.content{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:0 16px 100px;}
+.tabbar{position:absolute; left:0; right:0; bottom:0; display:flex; background:#fff; box-shadow:0 -2px 12px rgba(44,35,80,0.10); padding:8px 4px calc(8px + var(--safe-bottom)); z-index:20;}
+.tabbar button{flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; background:none; color:#B3ADCE; font-weight:800; font-size:10px; padding:6px 2px;}
+.tabbar button .ic{font-size:21px;}
+.tabbar button.active{color:var(--violet);}
+
+/* xp bar */
+.xp-wrap{background:#fff; border-radius:var(--radius-md); padding:14px 16px; margin:0 0 14px; box-shadow:0 3px 0 rgba(44,35,80,0.08); display:flex; align-items:center; gap:12px;}
+.lvl-badge{width:52px; height:52px; border-radius:50%; background:linear-gradient(160deg,var(--sun),#F09819); display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',cursive; font-weight:800; font-size:20px; color:#fff; flex-shrink:0; box-shadow:0 3px 0 #c9821a;}
+.xp-track{flex:1;}
+.xp-track .lbl{display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:var(--ink-soft); margin-bottom:4px;}
+.xp-bar-bg{height:14px; background:#EFEBFA; border-radius:999px; overflow:hidden;}
+.xp-bar-fill{height:100%; background:linear-gradient(90deg,var(--grass),#2FA85D); border-radius:999px; transition:width .5s cubic-bezier(.2,.9,.3,1);}
+
+.section-title{font-family:'Baloo 2',cursive; font-size:19px; font-weight:700; margin:22px 0 10px; display:flex; align-items:center; gap:8px;}
+.chip-row{display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin-bottom:12px;}
+.chip{flex-shrink:0; padding:9px 16px; border-radius:999px; background:#fff; font-weight:800; font-size:13px; color:var(--ink-soft); box-shadow:0 2px 0 rgba(44,35,80,0.08); border:2px solid transparent;}
+.chip.active{background:var(--violet); color:#fff;}
+
+.quest-card{display:flex; align-items:center; gap:12px; background:#fff; border-radius:var(--radius-md); padding:14px; margin-bottom:10px; box-shadow:0 3px 0 rgba(44,35,80,0.08);}
+.quest-card .qic{width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;}
+.quest-card .qbody{flex:1; min-width:0;}
+.quest-card .qbody .qt{font-weight:800; font-size:15px;}
+.quest-card .qbody .qr{font-size:12px; color:var(--ink-soft); font-weight:700; margin-top:2px;}
+.quest-card.done{opacity:.55;}
+
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+.grid-2{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+.tile{background:#fff; border-radius:var(--radius-md); padding:12px 8px; text-align:center; box-shadow:0 3px 0 rgba(44,35,80,0.08); position:relative;}
+.tile .em{font-size:32px; display:block;}
+.tile .nm{font-weight:800; font-size:12px; margin-top:6px;}
+.tile .price{font-size:11px; font-weight:800; color:var(--ink-soft); margin-top:2px;}
+.tile.locked{opacity:.4;}
+.rarity-dot{position:absolute; top:6px; right:6px; width:12px; height:12px; border-radius:50%; box-shadow:0 0 0 2px #fff;}
+.owned-badge{position:absolute; top:6px; left:6px; background:var(--grass); color:#fff; font-size:9px; font-weight:800; padding:2px 6px; border-radius:8px;}
+
+.progress-row{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
+.progress-row .pl{width:90px; font-size:13px; font-weight:800; flex-shrink:0;}
+.progress-row .pb{flex:1; height:12px; background:#EFEBFA; border-radius:999px; overflow:hidden;}
+.progress-row .pb i{display:block; height:100%; background:linear-gradient(90deg,var(--sky),var(--sky-deep));}
+.progress-row .pn{width:38px; text-align:right; font-size:12px; font-weight:800; color:var(--ink-soft);}
+
+/* island */
+.island-tabs{display:flex; gap:8px; overflow-x:auto; padding:2px 0 10px;}
+.island-stage{position:relative; border-radius:var(--radius-lg); height:44vh; min-height:260px; overflow:hidden; box-shadow:0 6px 0 rgba(44,35,80,0.10); margin-bottom:12px;}
+.island-stage .placed{position:absolute; font-size:34px; transform:translate(-50%,-50%);}
+.island-inv{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
+.island-inv .item{background:#fff; border-radius:14px; padding:8px 4px; text-align:center; box-shadow:0 3px 0 rgba(44,35,80,0.08); font-size:26px;}
+.island-inv .item.sel{outline:3px solid var(--violet);}
+
+/* avatar */
+.avatar-face{width:120px; height:120px; border-radius:50%; background:#F4F1FE; display:flex; align-items:center; justify-content:center; font-size:64px; margin:0 auto 14px; box-shadow:0 4px 0 rgba(44,35,80,0.1);}
+
+/* modal / toast */
+.modal-bg{position:fixed; inset:0; background:rgba(44,35,80,0.5); display:flex; align-items:center; justify-content:center; z-index:100; padding:24px;}
+.modal-bg.hidden{display:none;}
+.modal-card{background:#fff; border-radius:var(--radius-lg); padding:26px; width:100%; max-width:420px; max-height:82vh; overflow-y:auto; text-align:center;}
+.modal-card h2{margin-top:0;}
+.toast-wrap{position:fixed; top:calc(var(--safe-top) + 10px); left:0; right:0; display:flex; flex-direction:column; align-items:center; gap:8px; z-index:200; pointer-events:none;}
+.toast{background:var(--ink); color:#fff; font-weight:800; padding:12px 20px; border-radius:999px; box-shadow:0 4px 14px rgba(0,0,0,0.25); font-size:14px; display:flex; align-items:center; gap:8px; animation:toastIn .35s ease, toastOut .4s ease 2.4s forwards;}
+@keyframes toastIn{from{transform:translateY(-20px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+@keyframes toastOut{to{transform:translateY(-20px); opacity:0;}}
+@keyframes pop{0%{transform:scale(0.6); opacity:0;}60%{transform:scale(1.08);}100%{transform:scale(1); opacity:1;}}
+.pop-anim{animation:pop .4s cubic-bezier(.2,.9,.3,1);}
+@keyframes coinfly{from{transform:translateY(0) scale(1); opacity:1;} to{transform:translateY(-60px) scale(0.4); opacity:0;}}
+
+/* admin */
+#screen-admin .content{padding-bottom:100px;}
+.admin-table{width:100%; border-collapse:collapse; font-size:13px;}
+.admin-table th{text-align:left; font-size:11px; color:var(--ink-soft); padding:6px 8px; border-bottom:2px solid #EFEBFA;}
+.admin-table td{padding:9px 8px; border-bottom:1px solid #F4F1FE; font-weight:700;}
+.form-row{display:flex; gap:10px;}
+.form-row > *{flex:1;}
+.family-code-box{background:linear-gradient(160deg,var(--violet),var(--violet-deep)); color:#fff; border-radius:var(--radius-lg); padding:20px; text-align:center; margin-bottom:16px;}
+.family-code-box .code{font-family:'Baloo 2',cursive; font-size:34px; letter-spacing:6px; font-weight:800; margin:6px 0;}
+.close-x{position:absolute; top:14px; right:14px; background:#F4F1FE; width:32px; height:32px; border-radius:50%; font-weight:800; color:var(--ink-soft); font-size:16px;}
+.empty-state{text-align:center; padding:40px 20px; color:var(--ink-soft); font-weight:700;}
+.empty-state .em{font-size:44px; display:block; margin-bottom:10px;}
+</style>
+</head>
+<body>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ============================= LOGIN SCREEN ============================= -->
+<div class="screen active" id="screen-login">
+  <div class="login-wrap" id="loginHome">
+    <div class="logo">🏔️</div>
+    <h1>Quest World</h1>
+    <p>Learn, play, and build your island!</p>
+    <div class="role-cards">
+      <button class="role-card" onclick="showAuthPanel('parent')"><span class="emoji">🧑‍💼</span>I'm a Grown-Up</button>
+      <button class="role-card" onclick="showAuthPanel('kid')"><span class="emoji">🧒</span>I'm a Kid</button>
+    </div>
+
+    <!-- Parent auth -->
+    <div class="auth-panel hidden" id="panelParent">
+      <h2 id="parentPanelTitle">Grown-Up Sign In</h2>
+      <div class="sub" id="parentPanelSub">Sign in to manage your family's Quest World.</div>
+      <label>Email</label>
+      <input type="email" id="parentEmail" placeholder="you@email.com" autocomplete="username">
+      <label>Password</label>
+      <input type="password" id="parentPassword" placeholder="••••••••" autocomplete="current-password">
+      <div id="parentSignupExtra" class="hidden">
+        <label>Family Name</label>
+        <input type="text" id="familyName" placeholder="The Smith Family">
+      </div>
+      <button class="btn block sky" style="margin-top:16px;" id="parentSubmitBtn" onclick="parentSubmit()">Sign In</button>
+      <div style="text-align:center; margin-top:10px;">
+        <button class="link-btn" id="parentToggleModeBtn" onclick="toggleParentMode()">New family? Create an account</button>
+      </div>
+      <div class="error-msg" id="parentError"></div>
+    </div>
+
+    <!-- Kid auth -->
+    <div class="auth-panel hidden" id="panelKid">
+      <h2>Kid Login</h2>
+      <div class="sub">Enter your Family Code to find your profile.</div>
+      <label>Family Code</label>
+      <input type="text" id="kidFamilyCode" placeholder="ABC123" maxlength="6" style="text-transform:uppercase; letter-spacing:3px; font-weight:800; text-align:center;">
+      <button class="btn block grass" style="margin-top:14px;" onclick="loadKidPicker()">Find My Profiles</button>
+      <div id="kidPickerWrap" class="hidden">
+        <div class="kid-picker-grid" id="kidPickerGrid"></div>
+      </div>
+      <div id="kidPinWrap" class="hidden" style="margin-top:10px;">
+        <label>Enter your PIN</label>
+        <input type="password" id="kidPin" inputmode="numeric" maxlength="4" placeholder="••••" style="text-align:center; font-size:22px; letter-spacing:8px;">
+        <button class="btn block grass" style="margin-top:12px;" onclick="kidSubmitLogin()">Let's Go!</button>
+      </div>
+      <div class="error-msg" id="kidError"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= KID APP ============================= -->
+<div class="screen" id="screen-kid">
+  <div class="app-shell">
+    <div class="topbar">
+      <div>
+        <div style="font-size:12px; font-weight:800; color:var(--ink-soft);" id="kidGreeting">Hi!</div>
+        <div class="title" id="kidNameTitle">Explorer</div>
+      </div>
+      <div class="hud">
+        <div class="stat-pill"><span class="ic">🪙</span><span id="hudCoins">0</span></div>
+      </div>
+    </div>
+    <div class="content" id="kidContent">
+      <!-- views injected here -->
+    </div>
+    <div class="tabbar">
+      <button class="tab-btn active" data-tab="home" onclick="kidNav('home')"><span class="ic">🏠</span>Home</button>
+      <button class="tab-btn" data-tab="quests" onclick="kidNav('quests')"><span class="ic">📜</span>Quests</button>
+      <button class="tab-btn" data-tab="island" onclick="kidNav('island')"><span class="ic">🏝️</span>Island</button>
+      <button class="tab-btn" data-tab="pets" onclick="kidNav('pets')"><span class="ic">🐾</span>Pets</button>
+      <button class="tab-btn" data-tab="collection" onclick="kidNav('collection')"><span class="ic">🗂️</span>Collect</button>
+      <button class="tab-btn" data-tab="shop" onclick="kidNav('shop')"><span class="ic">🛍️</span>Shop</button>
+      <button class="tab-btn" data-tab="achievements" onclick="kidNav('achievements')"><span class="ic">🏆</span>Awards</button>
+      <button class="tab-btn" data-tab="profile" onclick="kidNav('profile')"><span class="ic">😊</span>Me</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= ADMIN APP ============================= -->
+<div class="screen" id="screen-admin">
+  <div class="app-shell">
+    <div class="topbar">
+      <div>
+        <div style="font-size:12px; font-weight:800; color:var(--ink-soft);">Quest World</div>
+        <div class="title">Admin</div>
+      </div>
+      <button class="btn small ghost" onclick="adminSignOut()">Sign Out</button>
+    </div>
+    <div class="content" id="adminContent"></div>
+    <div class="tabbar">
+      <button class="tab-btn active" data-tab="dashboard" onclick="adminNav('dashboard')"><span class="ic">📊</span>Home</button>
+      <button class="tab-btn" data-tab="children" onclick="adminNav('children')"><span class="ic">🧒</span>Kids</button>
+      <button class="tab-btn" data-tab="activities" onclick="adminNav('activities')"><span class="ic">📝</span>Quests</button>
+      <button class="tab-btn" data-tab="questions" onclick="adminNav('questions')"><span class="ic">❓</span>Questions</button>
+      <button class="tab-btn" data-tab="events" onclick="adminNav('events')"><span class="ic">🎉</span>Events</button>
+      <button class="tab-btn" data-tab="reports" onclick="adminNav('reports')"><span class="ic">📈</span>Reports</button>
+      <button class="tab-btn" data-tab="settings" onclick="adminNav('settings')"><span class="ic">⚙️</span>Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal -->
+<div class="modal-bg hidden" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal-card" id="modalCard"></div>
+</div>
+
+<script type="module">
+/* =====================================================================
+   FIREBASE CONFIG
+   Paste your Firebase project's config below. Create a project at
+   https://console.firebase.google.com, enable:
+     - Authentication -> Email/Password  AND Anonymous
+     - Firestore Database (start in production mode)
+   Then paste your web app config object here.
+   ===================================================================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyD1G9_ic5mhNHDgiqUVl3vb13UNKFzQCzI",
+  authDomain: "game-quest-a765d.firebaseapp.com",
+  projectId: "game-quest-a765d",
+  storageBucket: "game-quest-a765d.firebasestorage.app",
+  messagingSenderId: "299028726768",
+  appId: "1:299028726768:web:fdf27b10771a31673c1335"
+};
+
+/* Suggested Firestore Security Rules — paste into Firebase Console > Firestore > Rules:
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    match /families/{familyCode} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && resource.data.adminUid == request.auth.uid;
+      match /{document=**} {
+        allow read: if isSignedIn();
+        allow write: if isSignedIn();
+      }
+    }
+    match /links/{uid} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
+    }
+  }
+}
+NOTE: This app is designed for trusted family use on a shared device (like the
+Quest Coins app). Kids sign in anonymously and the family code acts as the
+shared secret; write access is intentionally permissive within a family's own
+document tree to keep the client-only architecture simple, matching the
+approach already used in Math Quest / Quest Coins.
+*/
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signInAnonymously,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc,
+  collection, onSnapshot, query, where, serverTimestamp, increment, arrayUnion
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+window.__fb = { app, auth, db };
+
+/* ===================================================================
+   CATALOGS — generated content so systems are real, not placeholders
+   =================================================================== */
+const REGIONS = [
+  { id:'starter', name:'Starter Village', level:1, emoji:'🏘️', bg:'linear-gradient(160deg,#FFE1A8,#FFCE73)' },
+  { id:'forest',  name:'Forest',          level:3, emoji:'🌲', bg:'linear-gradient(160deg,#BEE9C0,#6FCF7A)' },
+  { id:'beach',   name:'Beach',           level:6, emoji:'🏖️', bg:'linear-gradient(160deg,#AEE7F5,#3FC5F0)' },
+  { id:'mountain',name:'Mountain',        level:10,emoji:'⛰️', bg:'linear-gradient(160deg,#D8D3EE,#9C93D6)' },
+  { id:'sky',     name:'Sky Islands',     level:15,emoji:'☁️', bg:'linear-gradient(160deg,#E8F3FF,#8FCBFF)' },
+  { id:'space',   name:'Space Zone',      level:20,emoji:'🌌', bg:'linear-gradient(160deg,#3B2E6B,#150F30)' },
+];
+
+const PET_CATS = [
+  { cat:'dogs', emojis:['🐕','🐩','🐕‍🦺','🦮'] },
+  { cat:'cats', emojis:['🐈','🐈‍⬛','🐱'] },
+  { cat:'birds', emojis:['🦜','🦉','🐦','🦩'] },
+  { cat:'dragons', emojis:['🐉','🐲'] },
+  { cat:'dinosaurs', emojis:['🦕','🦖'] },
+  { cat:'robots', emojis:['🤖'] },
+  { cat:'fantasy', emojis:['🦄','🧚','🐉','👾'] },
+];
+const RARITIES = [
+  {id:'common', mult:1, label:'Common'},
+  {id:'uncommon', mult:2, label:'Uncommon'},
+  {id:'rare', mult:4, label:'Rare'},
+  {id:'epic', mult:8, label:'Epic'},
+  {id:'legendary', mult:16, label:'Legendary'},
+];
+const PET_NAMES = ['Buddy','Luna','Spark','Pixel','Ember','Nova','Comet','Waffles','Bramble','Coco','Ziggy','Frost','Mochi','Boulder','Cricket'];
+function buildPets(){
+  const pets = []; let n=0;
+  PET_CATS.forEach(pc=>{
+    pc.emojis.forEach((em, ei)=>{
+      RARITIES.forEach((r, ri)=>{
+        n++;
+        pets.push({
+          id:'pet_'+n,
+          name: PET_NAMES[n % PET_NAMES.length] + ' the ' + pc.cat.slice(0,-1).replace(/^\w/,c=>c.toUpperCase()),
+          category: pc.cat, emoji: em, rarity: r.id,
+          price: 40 * r.mult,
+        });
+      });
+    });
+  });
+  return pets;
+}
+const PETS = buildPets();
+
+const FURNITURE = [
+  {id:'f_bed1',name:'Cozy Bed',cat:'furniture',emoji:'🛏️',price:60},
+  {id:'f_bed2',name:'Bunk Bed',cat:'furniture',emoji:'🛏️',price:120},
+  {id:'f_chair1',name:'Comfy Chair',cat:'furniture',emoji:'🪑',price:30},
+  {id:'f_table1',name:'Round Table',cat:'furniture',emoji:'🪟',price:40},
+  {id:'f_plant1',name:'Potted Plant',cat:'furniture',emoji:'🪴',price:20},
+  {id:'f_poster1',name:'Star Poster',cat:'furniture',emoji:'🖼️',price:15},
+  {id:'f_rug1',name:'Round Rug',cat:'furniture',emoji:'🟤',price:25},
+  {id:'f_lamp1',name:'Lava Lamp',cat:'furniture',emoji:'💡',price:35},
+];
+const DECOR = [
+  {id:'d_tree1',name:'Oak Tree',cat:'decorations',emoji:'🌳',price:25},
+  {id:'d_tree2',name:'Palm Tree',cat:'decorations',emoji:'🌴',price:30},
+  {id:'d_flower1',name:'Flower Patch',cat:'decorations',emoji:'🌷',price:15},
+  {id:'d_flower2',name:'Sunflower',cat:'decorations',emoji:'🌻',price:15},
+  {id:'d_fence1',name:'Fence',cat:'decorations',emoji:'🥅',price:10},
+  {id:'d_path1',name:'Stone Path',cat:'decorations',emoji:'🪨',price:10},
+  {id:'d_statue1',name:'Golden Statue',cat:'decorations',emoji:'🗿',price:90},
+  {id:'d_water1',name:'Fountain',cat:'decorations',emoji:'⛲',price:70},
+  {id:'d_water2',name:'Pond',cat:'decorations',emoji:'🌊',price:60},
+];
+const COSMETICS = {
+  hair:['💇','👱','👩‍🦰','👨‍🦱','👧','🧑‍🦳'],
+  outfit:['👕','🥋','🦺','👘','🥼'],
+  hat:['🎩','🧢','👑','🎓','⛑️'],
+  glasses:['🕶️','👓'],
+  shoes:['👟','🥾','🩴'],
+  accessory:['🎒','🧣','💍','⌚'],
+};
+const SHOP_COSMETICS = [];
+Object.entries(COSMETICS).forEach(([slot,arr])=>{
+  arr.forEach((em,i)=>{
+    if(i===0) return; // first of each is free-default, rest purchasable
+    SHOP_COSMETICS.push({id:'c_'+slot+i, name:slot.charAt(0).toUpperCase()+slot.slice(1)+' '+ (i), cat:'cosmetics', slot, emoji:em, price:20+i*10});
+  });
+});
+
+const ACHIEVEMENTS = [
+  {id:'a_first_quest',name:'First Steps',cat:'Learning',cond:'complete_quests',target:1,emoji:'👣',coins:20,xp:10},
+  {id:'a_ten_quests',name:'Quest Rookie',cat:'Learning',cond:'complete_quests',target:10,emoji:'📘',coins:40,xp:25},
+  {id:'a_fifty_quests',name:'Quest Master',cat:'Learning',cond:'complete_quests',target:50,emoji:'📚',coins:120,xp:80},
+  {id:'a_hundred_quests',name:'Quest Legend',cat:'Learning',cond:'complete_quests',target:100,emoji:'🎓',coins:250,xp:150},
+  {id:'a_first_pet',name:'Pet Pal',cat:'Collection',cond:'own_pets',target:1,emoji:'🐣',coins:20,xp:10},
+  {id:'a_five_pets',name:'Pet Collector',cat:'Collection',cond:'own_pets',target:5,emoji:'🐾',coins:60,xp:30},
+  {id:'a_legendary_pet',name:'Legendary Finder',cat:'Collection',cond:'own_legendary',target:1,emoji:'✨',coins:150,xp:60},
+  {id:'a_forest',name:'Into the Woods',cat:'Exploration',cond:'unlock_region',target:'forest',emoji:'🌲',coins:30,xp:20},
+  {id:'a_beach',name:'Sandy Toes',cat:'Exploration',cond:'unlock_region',target:'beach',emoji:'🏖️',coins:30,xp:20},
+  {id:'a_mountain',name:'Peak Climber',cat:'Exploration',cond:'unlock_region',target:'mountain',emoji:'⛰️',coins:40,xp:30},
+  {id:'a_sky',name:'Sky Wanderer',cat:'Exploration',cond:'unlock_region',target:'sky',emoji:'☁️',coins:50,xp:40},
+  {id:'a_space',name:'Space Explorer',cat:'Exploration',cond:'unlock_region',target:'space',emoji:'🌌',coins:80,xp:60},
+  {id:'a_level5',name:'Rising Star',cat:'Progress',cond:'reach_level',target:5,emoji:'⭐',coins:50,xp:0},
+  {id:'a_level10',name:'Shining Star',cat:'Progress',cond:'reach_level',target:10,emoji:'🌟',coins:100,xp:0},
+  {id:'a_level20',name:'Superstar',cat:'Progress',cond:'reach_level',target:20,emoji:'💫',coins:200,xp:0},
+  {id:'a_streak3',name:'On a Roll',cat:'Activity',cond:'login_streak',target:3,emoji:'🔥',coins:30,xp:15},
+  {id:'a_streak7',name:'Week Warrior',cat:'Activity',cond:'login_streak',target:7,emoji:'🔥',coins:80,xp:40},
+  {id:'a_decorator',name:'Island Decorator',cat:'Collection',cond:'own_decor',target:5,emoji:'🌷',coins:30,xp:15},
+];
+
+const DEFAULT_QUESTS = [
+  {id:'q_math1',category:'Math',title:'Solve 5 Math Problems',type:'math',target:5,coins:15,xp:10},
+  {id:'q_read1',category:'Reading',title:'Read for 15 Minutes',type:'timer',target:15,coins:15,xp:10},
+  {id:'q_sci1',category:'Science',title:'Answer 3 Science Questions',type:'quiz',target:3,coins:15,xp:10},
+  {id:'q_geo1',category:'Geography',title:'Name 3 Countries',type:'quiz',target:3,coins:15,xp:10},
+  {id:'q_logic1',category:'Logic',title:'Solve a Logic Puzzle',type:'puzzle',target:1,coins:15,xp:10},
+  {id:'q_create1',category:'Creativity',title:'Draw Something Awesome',type:'checkoff',target:1,coins:10,xp:8},
+  {id:'q_chore1',category:'Chores',title:'Tidy Your Room',type:'checkoff',target:1,coins:15,xp:8},
+  {id:'q_ex1',category:'Exercise',title:'Do 20 Jumping Jacks',type:'checkoff',target:1,coins:10,xp:8},
+];
+const CATEGORY_META = {
+  Math:{emoji:'➗',color:'#3FC5F0'}, Reading:{emoji:'📖',color:'#6A4CE0'}, Science:{emoji:'🔬',color:'#3FCB78'},
+  Geography:{emoji:'🌍',color:'#FFC93C'}, Logic:{emoji:'🧩',color:'#B26AF0'}, Creativity:{emoji:'🎨',color:'#FF5C9D'},
+  Chores:{emoji:'🧹',color:'#FF6F59'}, Exercise:{emoji:'🏃',color:'#3FCB78'},
+};
+const AVATAR_DEFAULT = { hair:COSMETICS.hair[0], outfit:COSMETICS.outfit[0], hat:'', glasses:'', shoes:COSMETICS.shoes[0], accessory:'' };
+
+/* ===================================================================
+   HELPERS
+   =================================================================== */
+function $(id){ return document.getElementById(id); }
+function xpForLevel(l){ return 50 + (l-1)*35; }
+function totalXpForLevel(l){ let t=0; for(let i=1;i<l;i++) t+=xpForLevel(i); return t; }
+function levelFromXp(xp){ let l=1; while(xp >= totalXpForLevel(l+1)) l++; return l; }
+function genFamilyCode(){ const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s=''; for(let i=0;i<6;i++) s+=chars[Math.floor(Math.random()*chars.length)]; return s; }
+function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function toast(msg, emoji='✨'){
+  const el = document.createElement('div');
+  el.className='toast pop-anim';
+  el.innerHTML = `<span>${emoji}</span><span>${msg}</span>`;
+  $('toastWrap').appendChild(el);
+  setTimeout(()=>el.remove(), 2900);
+}
+function seededRand(seed){
+  let s = seed % 2147483647; if (s<=0) s += 2147483646;
+  return function(){ s = s*16807 % 2147483647; return (s-1)/2147483646; };
+}
+function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))|0; } return Math.abs(h); }
+function openModal(html){ $('modalCard').innerHTML = html; $('modalBg').classList.remove('hidden'); }
+function closeModal(){ $('modalBg').classList.add('hidden'); }
+window.closeModal = closeModal;
+
+/* ===================================================================
+   STATE
+   =================================================================== */
+let state = {
+  mode:null,            // 'admin' | 'kid'
+  familyCode:null,
+  adminUid:null,
+  childId:null,
+  child:null,           // live child doc data
+  activities:[],        // custom admin quest templates
+  questions:[],         // custom admin questions
+  events:[],
+  children:[],          // admin: list of children
+  unsubs:[],
+};
+function clearUnsubs(){ state.unsubs.forEach(u=>u()); state.unsubs=[]; }
+
+/* ===================================================================
+   AUTH FLOW — role panels
+   =================================================================== */
+let parentMode = 'signin';
+window.showAuthPanel = function(role){
+  $('panelParent').classList.toggle('hidden', role!=='parent');
+  $('panelKid').classList.toggle('hidden', role!=='kid');
+}
+window.toggleParentMode = function(){
+  parentMode = parentMode==='signin' ? 'signup' : 'signin';
+  $('parentPanelTitle').textContent = parentMode==='signin' ? 'Grown-Up Sign In' : 'Create Family Account';
+  $('parentPanelSub').textContent = parentMode==='signin' ? "Sign in to manage your family's Quest World." : "Set up a new family and get your Family Code.";
+  $('parentSignupExtra').classList.toggle('hidden', parentMode!=='signup');
+  $('parentSubmitBtn').textContent = parentMode==='signin' ? 'Sign In' : 'Create Account';
+  $('parentToggleModeBtn').textContent = parentMode==='signin' ? 'New family? Create an account' : 'Already have an account? Sign in';
+  $('parentError').textContent='';
+}
+
+window.parentSubmit = async function(){
+  const email = $('parentEmail').value.trim();
+  const pw = $('parentPassword').value;
+  const errEl = $('parentError'); errEl.textContent='';
+  if(!email || !pw){ errEl.textContent='Please enter an email and password.'; return; }
+  try{
+    if(parentMode==='signup'){
+      const famName = $('familyName').value.trim() || 'Our Family';
+      const cred = await createUserWithEmailAndPassword(auth, email, pw);
+      const code = genFamilyCode();
+      await setDoc(doc(db,'families',code), { adminUid: cred.user.uid, familyName: famName, createdAt: serverTimestamp() });
+      await setDoc(doc(db,'links',cred.user.uid), { familyCode: code, role:'admin' });
+      localStorage.setItem('qw_familyCode', code);
+    } else {
+      const cred = await signInWithEmailAndPassword(auth, email, pw);
+      const linkSnap = await getDoc(doc(db,'links',cred.user.uid));
+      if(linkSnap.exists()) localStorage.setItem('qw_familyCode', linkSnap.data().familyCode);
+    }
+  }catch(e){
+    errEl.textContent = friendlyAuthError(e);
+  }
+}
+function friendlyAuthError(e){
+  const c = e.code||'';
+  if(c.includes('email-already-in-use')) return 'That email is already registered — try signing in instead.';
+  if(c.includes('wrong-password')||c.includes('invalid-credential')) return 'Incorrect email or password.';
+  if(c.includes('user-not-found')) return 'No account found with that email.';
+  if(c.includes('weak-password')) return 'Password should be at least 6 characters.';
+  if(c.includes('invalid-email')) return 'That email address looks invalid.';
+  return 'Something went wrong. Please try again.';
+}
+
+let kidPickerFamilyCode=null, kidPickerChildren=[], kidSelected=null;
+window.loadKidPicker = async function(){
+  const code = $('kidFamilyCode').value.trim().toUpperCase();
+  const errEl = $('kidError'); errEl.textContent='';
+  if(code.length<4){ errEl.textContent='Enter your 6-character family code.'; return; }
+  try{
+    const famSnap = await getDoc(doc(db,'families',code));
+    if(!famSnap.exists()){ errEl.textContent='Family code not found. Check with a grown-up!'; return; }
+    // need auth to read subcollection -> sign in anonymously if not already
+    if(!auth.currentUser){ await signInAnonymously(auth); }
+    const childrenSnap = await getDocsCompat(collection(db,'families',code,'children'));
+    kidPickerFamilyCode = code;
+    kidPickerChildren = childrenSnap;
+    const grid = $('kidPickerGrid');
+    grid.innerHTML='';
+    if(childrenSnap.length===0){
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><span class="em">🧑‍💼</span>No kid profiles yet. Ask a grown-up to create one in Admin → Kids.</div>';
+    } else {
+      childrenSnap.forEach(c=>{
+        const div=document.createElement('button');
+        div.className='kid-picker-item';
+        div.innerHTML = `<div class="av">${(c.data.avatar&&c.data.avatar.hair)||'🧒'}</div><div class="nm">${escapeHtml(c.data.name||c.data.username)}</div>`;
+        div.onclick=()=>selectKidProfile(c.id, c.data);
+        grid.appendChild(div);
+      });
+    }
+    $('kidPickerWrap').classList.remove('hidden');
+  }catch(e){
+    errEl.textContent = 'Could not connect. Check your internet connection.';
+  }
+}
+async function getDocsCompat(colRef){
+  return new Promise((resolve)=>{
+    const unsub = onSnapshot(colRef, snap=>{
+      unsub();
+      resolve(snap.docs.map(d=>({id:d.id, data:d.data()})));
+    }, ()=>resolve([]));
+  });
+}
+function selectKidProfile(id, data){
+  kidSelected = { id, data };
+  document.querySelectorAll('.kid-picker-item').forEach(el=>el.style.borderColor='transparent');
+  event.currentTarget.style.borderColor = 'var(--violet)';
+  $('kidPinWrap').classList.remove('hidden');
+}
+window.kidSubmitLogin = async function(){
+  const pin = $('kidPin').value.trim();
+  const errEl = $('kidError');
+  if(!kidSelected){ errEl.textContent='Pick your profile first!'; return; }
+  if(pin !== (kidSelected.data.pin||'')){ errEl.textContent='That PIN is not quite right — try again.'; return; }
+  localStorage.setItem('qw_familyCode', kidPickerFamilyCode);
+  localStorage.setItem('qw_childId', kidSelected.id);
+  enterKidMode(kidPickerFamilyCode, kidSelected.id);
+}
+function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ===================================================================
+   AUTH STATE OBSERVER — auto rejoin session
+   =================================================================== */
+onAuthStateChanged(auth, async (user)=>{
+  if(!user) return;
+  // Are we resuming a kid session?
+  const savedCode = localStorage.getItem('qw_familyCode');
+  const savedChild = localStorage.getItem('qw_childId');
+  if(user.isAnonymous){
+    if(savedCode && savedChild){
+      enterKidMode(savedCode, savedChild);
+    }
+    return;
+  }
+  // Email/password user = admin/parent
+  const linkSnap = await getDoc(doc(db,'links',user.uid));
+  if(linkSnap.exists()){
+    enterAdminMode(linkSnap.data().familyCode, user.uid);
+  }
+});
+
+/* ===================================================================
+   SCREEN SWITCH
+   =================================================================== */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+/* ===================================================================
+   KID MODE
+   =================================================================== */
+async function enterKidMode(familyCode, childId){
+  clearUnsubs();
+  state.mode='kid'; state.familyCode=familyCode; state.childId=childId;
+  showScreen('screen-kid');
+  const famSnap = await getDoc(doc(db,'families',familyCode));
+  state.adminUid = famSnap.exists() ? famSnap.data().adminUid : null;
+
+  const childRef = doc(db,'families',familyCode,'children',childId);
+  const unsub1 = onSnapshot(childRef, snap=>{
+    if(!snap.exists()) return;
+    const prevLevel = state.child ? levelFromXp(state.child.xp||0) : null;
+    state.child = snap.data();
+    ensureDailyQuests(childRef, state.child);
+    const newLevel = levelFromXp(state.child.xp||0);
+    if(prevLevel!==null && newLevel>prevLevel){ showLevelUpModal(newLevel); }
+    renderKidTopbar();
+    renderKidView(currentKidTab);
+  });
+  state.unsubs.push(unsub1);
+
+  const unsub2 = onSnapshot(collection(db,'families',familyCode,'activities'), snap=>{
+    state.activities = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    if(currentKidTab==='quests') renderKidView('quests');
+  });
+  state.unsubs.push(unsub2);
+  const unsub3 = onSnapshot(collection(db,'families',familyCode,'questions'), snap=>{
+    state.questions = snap.docs.map(d=>({id:d.id, ...d.data()}));
+  });
+  state.unsubs.push(unsub3);
+  const unsub4 = onSnapshot(collection(db,'families',familyCode,'events'), snap=>{
+    state.events = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    if(currentKidTab==='home') renderKidView('home');
+  });
+  state.unsubs.push(unsub4);
+}
+
+async function ensureDailyQuests(childRef, child){
+  const t = todayStr();
+  if(child.dailyQuestState && child.dailyQuestState.date===t) return;
+  const rnd = seededRand(hashStr((child.username||'')+t));
+  const pool = [...DEFAULT_QUESTS];
+  const picks = [];
+  const shuffled = pool.map(q=>({q, k:rnd()})).sort((a,b)=>a.k-b.k).map(x=>x.q);
+  for(let i=0;i<4 && i<shuffled.length;i++) picks.push({ ...shuffled[i], progress:0, completed:false });
+  // bonus meta-goals
+  picks.push({ id:'daily_coins', category:'Bonus', title:'Earn 100 Coins Today', type:'coingoal', target:100, progress:0, completed:false, coins:25, xp:15, meta:true });
+  await updateDoc(childRef, { dailyQuestState:{ date:t, quests:picks } }).catch(async()=>{
+    await setDoc(childRef, { dailyQuestState:{ date:t, quests:picks } }, { merge:true });
+  });
+  // login streak tracking
+  const lastLogin = child.stats && child.stats.lastLoginDate;
+  let streak = (child.stats && child.stats.loginStreak) || 0;
+  if(lastLogin!==t){
+    const y = new Date(Date.now()-86400000); const yStr = y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');
+    streak = (lastLogin===yStr) ? streak+1 : 1;
+    updateDoc(childRef, { 'stats.lastLoginDate': t, 'stats.loginStreak': streak }).catch(()=>{});
+    checkAchievements(childRef, {...child, stats:{...(child.stats||{}), loginStreak:streak}});
+  }
+}
+
+function renderKidTopbar(){
+  const c = state.child; if(!c) return;
+  $('kidGreeting').textContent = greetingForHour();
+  $('kidNameTitle').textContent = c.name || c.username || 'Explorer';
+  $('hudCoins').textContent = c.coins||0;
+}
+function greetingForHour(){ const h=new Date().getHours(); return h<12?'Good morning!':h<18?'Good afternoon!':'Good evening!'; }
+
+let currentKidTab='home';
+window.kidNav = function(tab){
+  currentKidTab = tab;
+  document.querySelectorAll('#screen-kid .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  renderKidView(tab);
+}
+
+async function awardChild(deltaCoins, deltaXp, msg, emoji){
+  const c = state.child;
+  const childRef = doc(db,'families',state.familyCode,'children',state.childId);
+  const newCoins = Math.max(0,(c.coins||0)+deltaCoins);
+  const newXp = Math.max(0,(c.xp||0)+deltaXp);
+  const updates = {
+    coins:newCoins, xp:newXp,
+    'stats.lifetimeCoins': increment(Math.max(0,deltaCoins)),
+    'stats.lifetimeXp': increment(Math.max(0,deltaXp)),
+  };
+  await updateDoc(childRef, updates);
+  if(msg) toast(msg, emoji||'🪙');
+  checkAchievements(childRef, {...c, coins:newCoins, xp:newXp});
+}
+
+async function completeDailyQuest(qid){
+  const c = state.child;
+  const dqs = c.dailyQuestState.quests.map(q=>{
+    if(q.id===qid && !q.completed){ return {...q, completed:true, progress:q.target}; }
+    return q;
+  });
+  const q = c.dailyQuestState.quests.find(x=>x.id===qid);
+  if(!q || q.completed) return;
+  const childRef = doc(db,'families',state.familyCode,'children',state.childId);
+  await updateDoc(childRef, {
+    dailyQuestState:{ date:c.dailyQuestState.date, quests:dqs },
+    coins: (c.coins||0)+q.coins, xp:(c.xp||0)+q.xp,
+    'stats.questsCompleted': increment(1),
+    'stats.lifetimeCoins': increment(q.coins),
+    'stats.lifetimeXp': increment(q.xp),
+  });
+  toast(`Quest complete! +${q.coins} coins, +${q.xp} XP`, '🎉');
+  checkAchievements(childRef, {...c, coins:(c.coins||0)+q.coins, xp:(c.xp||0)+q.xp, stats:{...(c.stats||{}), questsCompleted: ((c.stats&&c.stats.questsCompleted)||0)+1 }});
+}
+
+async function completeCustomActivity(act){
+  const c = state.child;
+  const childRef = doc(db,'families',state.familyCode,'children',state.childId);
+  await updateDoc(childRef, {
+    coins:(c.coins||0)+(act.coins||0), xp:(c.xp||0)+(act.xp||0),
+    'stats.questsCompleted': increment(1),
+    'stats.lifetimeCoins': increment(act.coins||0),
+    'stats.lifetimeXp': increment(act.xp||0),
+  });
+  toast(`"${act.title}" complete! +${act.coins} coins`, '🎉');
+}
+
+async function checkAchievements(childRef, c){
+  const owned = (c.achievements)||[];
+  const stats = c.stats||{};
+  const level = levelFromXp(c.xp||0);
+  const ownedPets = (c.inventory&&c.inventory.pets)||[];
+  const ownedDecor = (c.inventory&&c.inventory.decorations)||[];
+  const regions = c.unlockedRegions||['starter'];
+  for(const a of ACHIEVEMENTS){
+    if(owned.includes(a.id)) continue;
+    let met=false;
+    if(a.cond==='complete_quests') met = (stats.questsCompleted||0) >= a.target;
+    if(a.cond==='own_pets') met = ownedPets.length >= a.target;
+    if(a.cond==='own_decor') met = ownedDecor.length >= a.target;
+    if(a.cond==='own_legendary') met = ownedPets.some(pid=>{ const p=PETS.find(x=>x.id===pid); return p && p.rarity==='legendary'; });
+    if(a.cond==='unlock_region') met = regions.includes(a.target);
+    if(a.cond==='reach_level') met = level >= a.target;
+    if(a.cond==='login_streak') met = (stats.loginStreak||0) >= a.target;
+    if(met){
+      await updateDoc(childRef, {
+        achievements: arrayUnion(a.id),
+        coins: increment(a.coins||0), xp: increment(a.xp||0),
+      });
+      toast(`Achievement unlocked: ${a.name}!`, a.emoji);
+    }
+  }
+  // region unlocks by level
+  const newRegions = REGIONS.filter(r=>level>=r.level).map(r=>r.id);
+  if(newRegions.length > regions.length){
+    await updateDoc(childRef, { unlockedRegions:newRegions });
+    const justUnlocked = newRegions.filter(r=>!regions.includes(r));
+    justUnlocked.forEach(rid=>{ const r=REGIONS.find(x=>x.id===rid); toast(`New region unlocked: ${r.name}!`, r.emoji); });
+  }
+}
+
+function showLevelUpModal(level){
+  openModal(`
+    <div class="pop-anim">
+      <div style="font-size:64px;">🎉</div>
+      <h2>Level Up!</h2>
+      <p style="font-weight:700; color:var(--ink-soft);">You reached Level ${level}!</p>
+      <button class="btn block sun" onclick="closeModal()">Awesome!</button>
+    </div>`);
+}
+
+/* ---------- KID VIEWS ---------- */
+function renderKidView(tab){
+  const c = state.child; if(!c) return;
+  const el = $('kidContent');
+  if(tab==='home') el.innerHTML = viewHome(c);
+  else if(tab==='quests') el.innerHTML = viewQuests(c);
+  else if(tab==='island') el.innerHTML = viewIsland(c);
+  else if(tab==='pets') el.innerHTML = viewPets(c);
+  else if(tab==='collection') el.innerHTML = viewCollection(c);
+  else if(tab==='shop') el.innerHTML = viewShop(c);
+  else if(tab==='achievements') el.innerHTML = viewAchievements(c);
+  else if(tab==='profile') el.innerHTML = viewProfile(c);
+  el.scrollTop = 0;
+}
+
+function xpBarHtml(c){
+  const level = levelFromXp(c.xp||0);
+  const base = totalXpForLevel(level);
+  const need = xpForLevel(level);
+  const into = (c.xp||0)-base;
+  const pct = Math.min(100, Math.round(into/need*100));
+  return `<div class="xp-wrap">
+    <div class="lvl-badge">${level}</div>
+    <div class="xp-track">
+      <div class="lbl"><span>Level ${level}</span><span>${into}/${need} XP</span></div>
+      <div class="xp-bar-bg"><div class="xp-bar-fill" style="width:${pct}%"></div></div>
+    </div>
+  </div>`;
+}
+
+function viewHome(c){
+  const dq = (c.dailyQuestState&&c.dailyQuestState.quests)||[];
+  const doneCount = dq.filter(q=>q.completed).length;
+  const activeEvents = state.events.filter(e=> isEventActive(e) );
+  return `
+    ${xpBarHtml(c)}
+    ${activeEvents.length? `<div class="section-title">🎉 Happening Now</div>` + activeEvents.map(e=>`
+      <div class="card" style="margin-bottom:10px; background:linear-gradient(135deg,#FFE9A8,#FFD26B);">
+        <div style="font-weight:800;">${escapeHtml(e.name)}</div>
+        <div style="font-size:13px; color:var(--ink-soft); font-weight:700;">${escapeHtml(e.description||'')}</div>
+      </div>`).join('') : ''}
+    <div class="section-title">📜 Today's Quests <span style="font-size:12px; color:var(--ink-soft);">(${doneCount}/${dq.length})</span></div>
+    ${dq.slice(0,4).map(q=>questCardHtml(q, true)).join('')}
+    <button class="btn ghost block" onclick="kidNav('quests')">See All Quests →</button>
+    <div class="section-title">🏝️ Your Island</div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:13px; color:var(--ink-soft); font-weight:700; margin-bottom:8px;">Tap below to visit and decorate!</div>
+      <button class="btn sky" onclick="kidNav('island')">Visit Island 🏝️</button>
+    </div>
+  `;
+}
+function isEventActive(e){
+  const now = Date.now();
+  const s = e.startDate? new Date(e.startDate).getTime(): -Infinity;
+  const en = e.endDate? new Date(e.endDate).getTime()+86399999: Infinity;
+  return now>=s && now<=en;
+}
+
+function questCardHtml(q, isDaily){
+  const meta = CATEGORY_META[q.category] || {emoji:'⭐', color:'#B26AF0'};
+  const canInteract = !q.completed;
+  return `<div class="quest-card ${q.completed?'done':''}">
+    <div class="qic" style="background:${meta.color}22; color:${meta.color};">${meta.emoji}</div>
+    <div class="qbody">
+      <div class="qt">${escapeHtml(q.title)}</div>
+      <div class="qr">+${q.coins} 🪙 · +${q.xp} XP</div>
+    </div>
+    ${q.completed
+      ? `<span style="font-size:22px;">✅</span>`
+      : `<button class="btn small grass" onclick="openQuestPlay('${q.id}', ${isDaily})">Go</button>`}
+  </div>`;
+}
+
+let questCategoryFilter='All';
+function viewQuests(c){
+  const dq = (c.dailyQuestState&&c.dailyQuestState.quests)||[];
+  const customActs = state.activities;
+  const cats = ['All', ...Object.keys(CATEGORY_META)];
+  return `
+    <div class="section-title">📜 Daily Quests</div>
+    ${dq.map(q=>questCardHtml(q,true)).join('') || '<div class="empty-state"><span class="em">📜</span>No quests today yet.</div>'}
+    <div class="section-title">✍️ More Activities</div>
+    <div class="chip-row">${cats.map(cat=>`<button class="chip ${questCategoryFilter===cat?'active':''}" onclick="setQuestFilter('${cat}')">${cat}</button>`).join('')}</div>
+    ${customActs.filter(a=>questCategoryFilter==='All'||a.category===questCategoryFilter).map(a=>questCardHtml({...a, completed:false}, false)).join('') || '<div class="empty-state"><span class="em">🗒️</span>No extra activities yet — ask a grown-up to add some in Admin → Quests!</div>'}
+  `;
+}
+window.setQuestFilter = function(cat){ questCategoryFilter=cat; renderKidView('quests'); }
+
+window.openQuestPlay = function(qid, isDaily){
+  if(isDaily){
+    const q = state.child.dailyQuestState.quests.find(x=>x.id===qid);
+    playQuest(q, ()=>completeDailyQuest(qid));
+  } else {
+    const a = state.activities.find(x=>x.id===qid);
+    playQuest({...a, type:'checkoff'}, ()=>completeCustomActivity(a));
+  }
+}
+
+function playQuest(q, onDone){
+  if(q.type==='math'){
+    const rnd = Math.random;
+    const a1=Math.floor(rnd()*12)+1, a2=Math.floor(rnd()*12)+1;
+    const ops=['+','-','×']; const op=ops[Math.floor(rnd()*ops.length)];
+    let answer = op==='+' ? a1+a2 : op==='-' ? a1-a2 : a1*a2;
+    openModal(`
+      <h2>➗ Quick Math!</h2>
+      <div style="font-size:38px; font-weight:800; margin:20px 0;">${a1} ${op} ${a2} = ?</div>
+      <input type="number" id="mathAns" style="text-align:center; font-size:24px;" placeholder="?">
+      <div class="error-msg" id="mathErr"></div>
+      <button class="btn block grass" style="margin-top:14px;" onclick="checkMathAns(${answer})">Submit</button>
+    `);
+    window.__mathDone = onDone;
+  } else if(q.type==='quiz'){
+    const bank = state.questions.filter(qq=>qq.category===q.category);
+    if(bank.length===0){
+      openModal(`<h2>${escapeHtml(q.title)}</h2><p style="font-weight:700; color:var(--ink-soft);">No custom questions yet — mark this done when you've finished with a grown-up!</p><button class="btn block grass" onclick="closeModal(); (${()=>{}})();" id="quizFallback">Mark Done</button>`);
+      document.getElementById('quizFallback').onclick=()=>{ closeModal(); onDone(); };
+    } else {
+      const picked = bank[Math.floor(Math.random()*bank.length)];
+      openModal(`
+        <h2>${escapeHtml(picked.category)} Question</h2>
+        <div style="font-weight:700; margin:14px 0;">${escapeHtml(picked.question)}</div>
+        ${picked.choices.map((ch,i)=>`<button class="btn ghost block" style="margin-bottom:8px;" onclick="checkQuizAns(${i}, ${picked.correctIndex})">${escapeHtml(ch)}</button>`).join('')}
+        <div class="error-msg" id="quizErr"></div>
+      `);
+      window.__quizDone = onDone;
+    }
+  } else if(q.type==='timer'){
+    openModal(`
+      <h2>📖 Reading Time</h2>
+      <div style="font-weight:700; color:var(--ink-soft); margin-bottom:14px;">Read for ${q.target} minutes, then tap done!</div>
+      <div style="font-size:44px;" id="timerDisp">${q.target}:00</div>
+      <button class="btn block grass" style="margin-top:14px;" onclick="closeModal(); (window.__timerDone=arguments[0]||null); (${'0'})">Mark Done</button>
+    `);
+    const btn = document.querySelector('.modal-card .btn.grass');
+    btn.onclick = ()=>{ closeModal(); onDone(); };
+  } else if(q.type==='puzzle'){
+    const seq=[2,4,6,8]; const ans=10;
+    openModal(`
+      <h2>🧩 Logic Puzzle</h2>
+      <div style="font-weight:700; margin:14px 0;">What comes next? 2, 4, 6, 8, ?</div>
+      <input type="number" id="puzzleAns" style="text-align:center; font-size:22px;">
+      <div class="error-msg" id="puzzleErr"></div>
+      <button class="btn block grass" style="margin-top:14px;" onclick="checkPuzzleAns(${ans})">Submit</button>
+    `);
+    window.__puzzleDone = onDone;
+  } else {
+    openModal(`
+      <h2>${escapeHtml(q.title)}</h2>
+      <div style="font-size:44px; margin:14px 0;">✅</div>
+      <p style="font-weight:700; color:var(--ink-soft);">Finish this with a grown-up, then tap done!</p>
+      <button class="btn block grass" onclick="closeModal(); (window.__checkoffDone)()">Mark Done</button>
+    `);
+    window.__checkoffDone = onDone;
+  }
+}
+window.checkMathAns = function(correct){
+  const v = parseFloat($('mathAns').value);
+  if(v===correct){ closeModal(); window.__mathDone(); }
+  else { $('mathErr').textContent = 'Not quite — try again!'; }
+}
+window.checkQuizAns = function(i, correct){
+  if(i===correct){ closeModal(); window.__quizDone(); }
+  else { $('quizErr').textContent = 'Not quite — try again!'; }
+}
+window.checkPuzzleAns = function(correct){
+  const v = parseFloat($('puzzleAns').value);
+  if(v===correct){ closeModal(); window.__puzzleDone(); }
+  else { $('puzzleErr').textContent = 'Not quite — try again!'; }
+}
+
+let islandRegionTab = 'starter';
+let islandSelectedItem = null;
+function viewIsland(c){
+  const unlocked = c.unlockedRegions || ['starter'];
+  const layout = (c.islandLayout && c.islandLayout[islandRegionTab]) || [];
+  const region = REGIONS.find(r=>r.id===islandRegionTab);
+  const ownedDecor = ((c.inventory&&c.inventory.decorations)||[]).map(id=>DECOR.find(d=>d.id===id)||FURNITURE.find(f=>f.id===id)).filter(Boolean);
+  return `
+    <div class="island-tabs">
+      ${REGIONS.map(r=>`<button class="chip ${islandRegionTab===r.id?'active':''}" ${unlocked.includes(r.id)?'':'disabled style="opacity:.4;"'} onclick="setIslandRegion('${r.id}')">${r.emoji} ${r.name}${unlocked.includes(r.id)?'':' 🔒'}</button>`).join('')}
+    </div>
+    <div class="island-stage" style="background:${region.bg};" id="islandStage" onclick="placeOnIsland(event)">
+      ${layout.map((p,i)=>`<div class="placed" style="left:${p.x}%; top:${p.y}%;">${p.emoji}</div>`).join('')}
+      ${!unlocked.includes(region.id) ? `<div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); color:#fff; font-weight:800; text-align:center; padding:20px;">🔒 Reach Level ${region.level} to unlock ${region.name}!</div>` : ''}
+    </div>
+    <div class="section-title">🎒 Your Decorations ${islandSelectedItem?'<span style="font-size:12px; color:var(--ink-soft);">(tap the island to place)</span>':''}</div>
+    <div class="island-inv">
+      ${ownedDecor.length ? ownedDecor.map(d=>`<button class="item ${islandSelectedItem&&islandSelectedItem.id===d.id?'sel':''}" onclick="selectIslandItem('${d.id}')">${d.emoji}</button>`).join('') : '<div class="empty-state" style="grid-column:1/-1;"><span class="em">🛍️</span>Buy decorations in the Shop!</div>'}
+    </div>
+  `;
+}
+window.setIslandRegion = function(id){
+  const unlocked = state.child.unlockedRegions || ['starter'];
+  if(!unlocked.includes(id)) return;
+  islandRegionTab = id; islandSelectedItem=null; renderKidView('island');
+}
+window.selectIslandItem = function(id){
+  const all=[...DECOR,...FURNITURE];
+  islandSelectedItem = all.find(x=>x.id===id);
+  renderKidView('island');
+}
+window.placeOnIsland = async function(ev){
+  if(!islandSelectedItem) return;
+  const stage = $('islandStage');
+  const rect = stage.getBoundingClientRect();
+  const x = ((ev.clientX-rect.left)/rect.width*100).toFixed(1);
+  const y = ((ev.clientY-rect.top)/rect.height*100).toFixed(1);
+  const c = state.child;
+  const layout = {...(c.islandLayout||{})};
+  layout[islandRegionTab] = [...(layout[islandRegionTab]||[]), { id:islandSelectedItem.id, emoji:islandSelectedItem.emoji, x:parseFloat(x), y:parseFloat(y) }];
+  const childRef = doc(db,'families',state.familyCode,'children',state.childId);
+  await updateDoc(childRef, { islandLayout: layout });
+  toast('Placed!', islandSelectedItem.emoji);
+}
+
+let petCategoryFilter='all';
+function viewPets(c){
+  const owned = (c.inventory&&c.inventory.pets)||[];
+  const cats=['all',...PET_CATS.map(p=>p.cat)];
+  const filtered = PETS.filter(p=>petCategoryFilter==='all'||p.category===petCategoryFilter);
+  return `
+    <div class="section-title">🐾 Pet Collection <span style="font-size:12px; color:var(--ink-soft);">(${owned.length}/${PETS.length})</span></div>
+    <div class="chip-row">${cats.map(cat=>`<button class="chip ${petCategoryFilter===cat?'active':''}" onclick="setPetFilter('${cat}')">${cat.charAt(0).toUpperCase()+cat.slice(1)}</button>`).join('')}</div>
+    <div class="grid-3">
+      ${filtered.map(p=>{
+        const isOwned = owned.includes(p.id);
+        return `<div class="tile ${isOwned?'':'locked'}">
+          <div class="rarity-dot" style="background:var(--${p.rarity});"></div>
+          ${isOwned?'<span class="owned-badge">OWNED</span>':''}
+          <span class="em">${p.emoji}</span>
+          <div class="nm">${isOwned?escapeHtml(p.name):'???'}</div>
+          <div class="price">${isOwned?p.rarity: p.price+' 🪙'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+window.setPetFilter = function(cat){ petCategoryFilter=cat; renderKidView('pets'); }
+
+function viewCollection(c){
+  const inv = c.inventory||{};
+  const petPct = Math.round(((inv.pets||[]).length/PETS.length)*100);
+  const decorPct = Math.round(((inv.decorations||[]).length/DECOR.length)*100);
+  const cosPct = Math.round(((inv.cosmetics||[]).length/SHOP_COSMETICS.length)*100);
+  const badgePct = Math.round(((c.achievements||[]).length/ACHIEVEMENTS.length)*100);
+  const furnPct = Math.round(((inv.furniture||[]).length/FURNITURE.length)*100);
+  const rows = [
+    ['Pets', petPct], ['Decorations', decorPct], ['Furniture', furnPct], ['Cosmetics', cosPct], ['Badges', badgePct]
+  ];
+  return `
+    <div class="section-title">🗂️ Your Collections</div>
+    <div class="card">
+      ${rows.map(([label,pct])=>`
+        <div class="progress-row">
+          <div class="pl">${label}</div>
+          <div class="pb"><i style="width:${pct}%;"></i></div>
+          <div class="pn">${pct}%</div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+let shopTab='pets';
+function viewShop(c){
+  const coins = c.coins||0;
+  const owned = c.inventory||{pets:[],furniture:[],decorations:[],cosmetics:[]};
+  const tabs=[['pets','Pets'],['furniture','Furniture'],['decorations','Decor'],['cosmetics','Cosmetics']];
+  let items;
+  if(shopTab==='pets') items = PETS.filter(p=>!owned.pets.includes(p.id)).slice(0,30);
+  else if(shopTab==='furniture') items = FURNITURE;
+  else if(shopTab==='decorations') items = DECOR;
+  else items = SHOP_COSMETICS;
+  return `
+    <div class="section-title">🛍️ Shop <span style="font-size:13px; color:var(--sun); font-weight:800;">🪙 ${coins}</span></div>
+    <div class="chip-row">${tabs.map(([k,l])=>`<button class="chip ${shopTab===k?'active':''}" onclick="setShopTab('${k}')">${l}</button>`).join('')}</div>
+    <div class="grid-3">
+      ${items.map(it=>{
+        const isOwned = shopTab==='pets' ? owned.pets.includes(it.id)
+          : shopTab==='cosmetics' ? owned.cosmetics.includes(it.id)
+          : shopTab==='furniture' ? owned.furniture.includes(it.id)
+          : owned.decorations.includes(it.id);
+        return `<button class="tile" onclick="openBuyModal('${it.id}','${shopTab}')">
+          ${it.rarity?`<div class="rarity-dot" style="background:var(--${it.rarity});"></div>`:''}
+          ${isOwned?'<span class="owned-badge">OWNED</span>':''}
+          <span class="em">${it.emoji}</span>
+          <div class="nm">${escapeHtml(it.name)}</div>
+          <div class="price">${isOwned?'Owned':it.price+' 🪙'}</div>
+        </button>`;
+      }).join('')}
+    </div>
+  `;
+}
+window.setShopTab = function(t){ shopTab=t; renderKidView('shop'); }
+window.openBuyModal = function(id, cat){
+  let it, invKey;
+  if(cat==='pets'){ it=PETS.find(p=>p.id===id); invKey='pets'; }
+  else if(cat==='furniture'){ it=FURNITURE.find(p=>p.id===id); invKey='furniture'; }
+  else if(cat==='decorations'){ it=DECOR.find(p=>p.id===id); invKey='decorations'; }
+  else { it=SHOP_COSMETICS.find(p=>p.id===id); invKey='cosmetics'; }
+  const owned = ((state.child.inventory&&state.child.inventory[invKey])||[]).includes(id);
+  openModal(`
+    <div style="font-size:60px;">${it.emoji}</div>
+    <h2>${escapeHtml(it.name)}</h2>
+    <p style="font-weight:700; color:var(--ink-soft);">${owned?'You already own this!' : it.price+' coins'}</p>
+    ${owned ? `<button class="btn block ghost" onclick="closeModal()">Close</button>` :
+      `<button class="btn block grass" onclick="buyItem('${id}','${invKey}',${it.price})">Buy Now</button>
+       <button class="btn block ghost" style="margin-top:8px;" onclick="closeModal()">Cancel</button>`}
+  `);
+}
+window.buyItem = async function(id, invKey, price){
+  const c = state.child;
+  if((c.coins||0) < price){ toast("Not enough coins yet!", '🪙'); return; }
+  const childRef = doc(db,'families',state.familyCode,'children',state.childId);
+  const inv = {...(c.inventory||{pets:[],furniture:[],decorations:[],cosmetics:[]})};
+  inv[invKey] = [...(inv[invKey]||[]), id];
+  await updateDoc(childRef, { coins: (c.coins||0)-price, inventory: inv });
+  closeModal();
+  toast('Purchased!', '🎁');
+  checkAchievements(childRef, {...c, coins:(c.coins||0)-price, inventory:inv});
+}
+
+function viewAchievements(c){
+  const owned = c.achievements||[];
+  const groups = {};
+  ACHIEVEMENTS.forEach(a=>{ (groups[a.cat]=groups[a.cat]||[]).push(a); });
+  return `
+    <div class="section-title">🏆 Achievements <span style="font-size:12px; color:var(--ink-soft);">(${owned.length}/${ACHIEVEMENTS.length})</span></div>
+    ${Object.entries(groups).map(([cat,list])=>`
+      <div style="font-weight:800; font-size:14px; color:var(--ink-soft); margin:14px 0 8px;">${cat}</div>
+      <div class="grid-3">
+        ${list.map(a=>`<div class="tile ${owned.includes(a.id)?'':'locked'}">
+          <span class="em">${a.emoji}</span>
+          <div class="nm">${escapeHtml(a.name)}</div>
+        </div>`).join('')}
+      </div>
+    `).join('')}
+  `;
+}
+
+let profileEditSlot=null;
+function viewProfile(c){
+  const av = c.avatar || AVATAR_DEFAULT;
+  const slots = Object.keys(COSMETICS);
+  const owned = (c.inventory&&c.inventory.cosmetics)||[];
+  return `
+    <div class="avatar-face">${av.hat||av.hair||'🧒'}</div>
+    <div style="text-align:center; font-weight:800; font-size:18px; margin-bottom:14px;">${escapeHtml(c.name||c.username)}</div>
+    <div class="section-title">😊 Customize</div>
+    <div class="chip-row">${slots.map(s=>`<button class="chip ${profileEditSlot===s?'active':''}" onclick="setProfileSlot('${s}')">${s.charAt(0).toUpperCase()+s.slice(1)}</button>`).join('')}</div>
+    ${profileEditSlot ? renderSlotOptions(profileEditSlot, av, owned) : '<div class="empty-state"><span class="em">✨</span>Pick a category above to customize!</div>'}
+    <div class="section-title">📊 Stats</div>
+    <div class="card">
+      <div class="progress-row"><div class="pl">Level</div><div class="pn" style="text-align:left; width:auto;">${levelFromXp(c.xp||0)}</div></div>
+      <div class="progress-row"><div class="pl">Total XP</div><div class="pn" style="text-align:left; width:auto;">${c.xp||0}</div></div>
+      <div class="progress-row"><div class="pl">Coins Earned</div><div class="pn" style="text-align:left; width:auto;">${(c.stats&&c.stats.lifetimeCoins)||0}</div></div>
+      <div class="progress-row"><div class="pl">Quests Done</div><div class="pn" style="text-align:left; width:auto;">${(c.stats&&c.stats.questsCompleted)||0}</div></div>
+      <div class="progress-row"><div class="pl">Login Streak</div><div class="pn" style="text-align:left; width:auto;">${(c.stats&&c.stats.loginStreak)||0} 🔥</div></div>
+    </div>
+    <button class="btn block ghost" style="margin-top:16px;" onclick="kidSignOut()">Sign Out</button>
+  `;
+}
+window.setProfileSlot = function(s){ profileEditSlot = profileEditSlot===s?null:s; renderKidView('profile'); }
+function renderSlotOptions(slot, av, ownedCosmetics){
+  const opts = COSMETICS[slot];
+  return `<div class="grid-3">
+    ${opts.map((em,i)=>{
+      const itemId = 'c_'+slot+i;
+      const isFree = i===0;
+      const isOwned = isFree || ownedCosmetics.includes(itemId);
+      const isEquipped = av[slot]===em;
+      return `<button class="tile ${isOwned?'':'locked'}" onclick="${isOwned?`equipCosmetic('${slot}','${em}')`:`openBuyModal('${itemId}','cosmetics')`}" style="${isEquipped?'outline:3px solid var(--violet);':''}">
+        <span class="em">${em}</span><div class="nm">${isOwned?(isEquipped?'Equipped':'Wear'):'Locked'}</div>
+      </button>`;
+    }).join('')}
+  </div>`;
+}
+window.equipCosmetic = async function(slot, emoji){
+  const c = state.child;
+  const av = {...(c.avatar||AVATAR_DEFAULT), [slot]: emoji};
+  const childRef = doc(db,'families',state.familyCode,'children',state.childId);
+  await updateDoc(childRef, { avatar: av });
+  toast('Equipped!', '✨');
+}
+window.kidSignOut = async function(){
+  localStorage.removeItem('qw_familyCode'); localStorage.removeItem('qw_childId');
+  clearUnsubs(); state={mode:null, unsubs:[]};
+  await signOut(auth);
+  showScreen('screen-login');
+  location.reload();
+}
+
+/* ===================================================================
+   ADMIN MODE
+   =================================================================== */
+async function enterAdminMode(familyCode, adminUid){
+  clearUnsubs();
+  state.mode='admin'; state.familyCode=familyCode; state.adminUid=adminUid;
+  showScreen('screen-admin');
+  localStorage.setItem('qw_familyCode', familyCode);
+
+  const unsubC = onSnapshot(collection(db,'families',familyCode,'children'), snap=>{
+    state.children = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    if(['dashboard','children','reports'].includes(currentAdminTab)) renderAdminView(currentAdminTab);
+  });
+  state.unsubs.push(unsubC);
+  const unsubA = onSnapshot(collection(db,'families',familyCode,'activities'), snap=>{
+    state.activities = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    if(currentAdminTab==='activities') renderAdminView('activities');
+  });
+  state.unsubs.push(unsubA);
+  const unsubQ = onSnapshot(collection(db,'families',familyCode,'questions'), snap=>{
+    state.questions = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    if(currentAdminTab==='questions') renderAdminView('questions');
+  });
+  state.unsubs.push(unsubQ);
+  const unsubE = onSnapshot(collection(db,'families',familyCode,'events'), snap=>{
+    state.events = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    if(currentAdminTab==='events') renderAdminView('events');
+  });
+  state.unsubs.push(unsubE);
+  renderAdminView('dashboard');
+}
+
+let currentAdminTab='dashboard';
+window.adminNav = function(tab){
+  currentAdminTab=tab;
+  document.querySelectorAll('#screen-admin .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  renderAdminView(tab);
+}
+window.adminSignOut = async function(){
+  clearUnsubs(); localStorage.removeItem('qw_familyCode');
+  await signOut(auth);
+  showScreen('screen-login'); location.reload();
+}
+
+function renderAdminView(tab){
+  const el = $('adminContent');
+  if(tab==='dashboard') el.innerHTML = adminDashboard();
+  else if(tab==='children') el.innerHTML = adminChildren();
+  else if(tab==='activities') el.innerHTML = adminActivities();
+  else if(tab==='questions') el.innerHTML = adminQuestions();
+  else if(tab==='events') el.innerHTML = adminEvents();
+  else if(tab==='reports') el.innerHTML = adminReports();
+  else if(tab==='settings') el.innerHTML = adminSettings();
+  el.scrollTop = 0;
+}
+
+function adminDashboard(){
+  const kids = state.children;
+  const totalCoins = kids.reduce((s,k)=>s+((k.stats&&k.stats.lifetimeCoins)||0),0);
+  const totalQuests = kids.reduce((s,k)=>s+((k.stats&&k.stats.questsCompleted)||0),0);
+  return `
+    <div class="family-code-box">
+      <div style="font-weight:700; opacity:.85;">Family Code</div>
+      <div class="code">${state.familyCode}</div>
+      <div style="font-size:12px; opacity:.8;">Kids enter this code to log in</div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><div style="font-size:12px; color:var(--ink-soft); font-weight:800;">Kids</div><div style="font-size:26px; font-weight:800;">${kids.length}</div></div>
+      <div class="card"><div style="font-size:12px; color:var(--ink-soft); font-weight:800;">Quests Done</div><div style="font-size:26px; font-weight:800;">${totalQuests}</div></div>
+      <div class="card"><div style="font-size:12px; color:var(--ink-soft); font-weight:800;">Coins Earned</div><div style="font-size:26px; font-weight:800;">${totalCoins}</div></div>
+      <div class="card"><div style="font-size:12px; color:var(--ink-soft); font-weight:800;">Custom Quests</div><div style="font-size:26px; font-weight:800;">${state.activities.length}</div></div>
+    </div>
+    <div class="section-title">🧒 Kids Overview</div>
+    ${kids.length? kids.map(k=>`
+      <div class="card" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+        <div><div style="font-weight:800;">${escapeHtml(k.name||k.username)}</div><div style="font-size:12px; color:var(--ink-soft); font-weight:700;">Level ${levelFromXp(k.xp||0)} · 🪙 ${k.coins||0}</div></div>
+      </div>`).join('') : `<div class="empty-state"><span class="em">🧒</span>No kids yet — add one in the Kids tab!</div>`}
+  `;
+}
+
+function adminChildren(){
+  return `
+    <div class="section-title">🧒 Kid Profiles</div>
+    <button class="btn grass block" onclick="openAddChildModal()">+ Add Kid Profile</button>
+    <div style="margin-top:14px;">
+      ${state.children.length? state.children.map(k=>`
+        <div class="card" style="margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:800;">${escapeHtml(k.name||k.username)} <span style="font-weight:600; color:var(--ink-soft); font-size:12px;">@${escapeHtml(k.username)}</span></div>
+              <div style="font-size:12px; color:var(--ink-soft); font-weight:700;">Level ${levelFromXp(k.xp||0)} · 🪙 ${k.coins||0} · PIN: ${k.pin}</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+            <button class="btn small sky" onclick="openAdjustCoinsModal('${k.id}')">Adjust Coins</button>
+            <button class="btn small sun" onclick="openGrantAchievementModal('${k.id}')">Grant Award</button>
+            <button class="btn small ghost" onclick="openResetPinModal('${k.id}')">Reset PIN</button>
+            <button class="btn small coral" onclick="deleteChild('${k.id}')">Remove</button>
+          </div>
+        </div>
+      `).join('') : `<div class="empty-state"><span class="em">🧒</span>No kid profiles yet.</div>`}
+    </div>
+  `;
+}
+window.openAddChildModal = function(){
+  openModal(`
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <h2>Add Kid Profile</h2>
+    <label>Display Name</label><input type="text" id="newChildName" placeholder="Ava">
+    <label>Username</label><input type="text" id="newChildUsername" placeholder="ava">
+    <label>4-Digit PIN</label><input type="password" id="newChildPin" inputmode="numeric" maxlength="4" placeholder="1234">
+    <div class="error-msg" id="addChildErr"></div>
+    <button class="btn block grass" style="margin-top:14px;" onclick="submitAddChild()">Create Profile</button>
+  `);
+}
+window.submitAddChild = async function(){
+  const name = $('newChildName').value.trim();
+  const username = $('newChildUsername').value.trim().toLowerCase();
+  const pin = $('newChildPin').value.trim();
+  const err = $('addChildErr');
+  if(!name||!username||pin.length<4){ err.textContent='Please fill in all fields (PIN needs 4 digits).'; return; }
+  if(state.children.some(c=>c.username===username)){ err.textContent='That username is taken.'; return; }
+  await addDoc(collection(db,'families',state.familyCode,'children'), {
+    name, username, pin, coins:0, xp:0, avatar:AVATAR_DEFAULT,
+    inventory:{pets:[],furniture:[],decorations:[],cosmetics:[]},
+    achievements:[], unlockedRegions:['starter'], islandLayout:{},
+    stats:{questsCompleted:0, lifetimeCoins:0, lifetimeXp:0, loginStreak:0, lastLoginDate:null},
+    createdAt: serverTimestamp(),
+  });
+  closeModal(); toast('Kid profile created!', '🎉');
+}
+window.openAdjustCoinsModal = function(id){
+  const k = state.children.find(c=>c.id===id);
+  openModal(`
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <h2>Adjust Coins — ${escapeHtml(k.name)}</h2>
+    <p style="font-weight:700; color:var(--ink-soft);">Current: 🪙 ${k.coins||0}</p>
+    <label>Amount (use negative to remove)</label>
+    <input type="number" id="coinAdjustAmt" placeholder="e.g. 20 or -10">
+    <button class="btn block sky" style="margin-top:14px;" onclick="submitAdjustCoins('${id}')">Apply</button>
+  `);
+}
+window.submitAdjustCoins = async function(id){
+  const amt = parseInt($('coinAdjustAmt').value)||0;
+  const k = state.children.find(c=>c.id===id);
+  await updateDoc(doc(db,'families',state.familyCode,'children',id), { coins: Math.max(0,(k.coins||0)+amt) });
+  closeModal(); toast('Coins updated!', '🪙');
+}
+window.openGrantAchievementModal = function(id){
+  const k = state.children.find(c=>c.id===id);
+  const owned = k.achievements||[];
+  const avail = ACHIEVEMENTS.filter(a=>!owned.includes(a.id));
+  openModal(`
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <h2>Grant Award — ${escapeHtml(k.name)}</h2>
+    <div class="grid-3" style="margin-top:10px;">
+      ${avail.map(a=>`<button class="tile" onclick="grantAchievement('${id}','${a.id}')"><span class="em">${a.emoji}</span><div class="nm">${a.name}</div></button>`).join('') || '<div class="empty-state" style="grid-column:1/-1;">All awards already earned!</div>'}
+    </div>
+  `);
+}
+window.grantAchievement = async function(childId, achId){
+  const a = ACHIEVEMENTS.find(x=>x.id===achId);
+  const k = state.children.find(c=>c.id===childId);
+  await updateDoc(doc(db,'families',state.familyCode,'children',childId), {
+    achievements: arrayUnion(achId), coins: (k.coins||0)+(a.coins||0), xp:(k.xp||0)+(a.xp||0)
+  });
+  closeModal(); toast('Award granted!', a.emoji);
+}
+window.openResetPinModal = function(id){
+  openModal(`
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <h2>Reset PIN</h2>
+    <label>New 4-Digit PIN</label>
+    <input type="password" id="resetPinVal" inputmode="numeric" maxlength="4" placeholder="1234">
+    <button class="btn block sky" style="margin-top:14px;" onclick="submitResetPin('${id}')">Save</button>
+  `);
+}
+window.submitResetPin = async function(id){
+  const pin = $('resetPinVal').value.trim();
+  if(pin.length<4) return;
+  await updateDoc(doc(db,'families',state.familyCode,'children',id), { pin });
+  closeModal(); toast('PIN reset!', '🔑');
+}
+window.deleteChild = async function(id){
+  if(!confirm('Remove this kid profile? This cannot be undone.')) return;
+  await deleteDoc(doc(db,'families',state.familyCode,'children',id));
+  toast('Profile removed.', '🗑️');
+}
+
+function adminActivities(){
+  return `
+    <div class="section-title">📝 Custom Quests</div>
+    <button class="btn grass block" onclick="openAddActivityModal()">+ Add Quest</button>
+    <table class="admin-table" style="margin-top:14px;">
+      <tr><th>Title</th><th>Category</th><th>Reward</th><th></th></tr>
+      ${state.activities.map(a=>`<tr>
+        <td>${escapeHtml(a.title)}</td><td>${escapeHtml(a.category)}</td><td>🪙${a.coins} / ${a.xp}xp</td>
+        <td><button class="btn small coral" onclick="deleteActivity('${a.id}')">Delete</button></td>
+      </tr>`).join('') || `<tr><td colspan="4" style="text-align:center; padding:20px;">No custom quests yet.</td></tr>`}
+    </table>
+  `;
+}
+window.openAddActivityModal = function(){
+  openModal(`
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <h2>Add Quest</h2>
+    <label>Title</label><input type="text" id="actTitle" placeholder="Clean the garage">
+    <label>Category</label>
+    <select id="actCategory">${Object.keys(CATEGORY_META).map(c=>`<option>${c}</option>`).join('')}</select>
+    <div class="form-row">
+      <div><label>Coin Reward</label><input type="number" id="actCoins" value="15"></div>
+      <div><label>XP Reward</label><input type="number" id="actXp" value="10"></div>
+    </div>
+    <button class="btn block grass" style="margin-top:14px;" onclick="submitAddActivity()">Add Quest</button>
+  `);
+}
+window.submitAddActivity = async function(){
+  const title=$('actTitle').value.trim(); if(!title) return;
+  await addDoc(collection(db,'families',state.familyCode,'activities'), {
+    title, category:$('actCategory').value, coins:parseInt($('actCoins').value)||10, xp:parseInt($('actXp').value)||5,
+  });
+  closeModal(); toast('Quest added!', '📝');
+}
+window.deleteActivity = async function(id){ await deleteDoc(doc(db,'families',state.familyCode,'activities',id)); }
+
+function adminQuestions(){
+  return `
+    <div class="section-title">❓ Custom Questions</div>
+    <button class="btn grass block" onclick="openAddQuestionModal()">+ Add Question</button>
+    <table class="admin-table" style="margin-top:14px;">
+      <tr><th>Question</th><th>Category</th><th></th></tr>
+      ${state.questions.map(q=>`<tr>
+        <td>${escapeHtml(q.question)}</td><td>${escapeHtml(q.category)}</td>
+        <td><button class="btn small coral" onclick="deleteQuestion('${q.id}')">Delete</button></td>
+      </tr>`).join('') || `<tr><td colspan="3" style="text-align:center; padding:20px;">No custom questions yet.</td></tr>`}
+    </table>
+  `;
+}
+window.openAddQuestionModal = function(){
+  openModal(`
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <h2>Add Question</h2>
+    <label>Category</label>
+    <select id="qCategory">${['Science','Geography','Math','Reading','Logic'].map(c=>`<option>${c}</option>`).join('')}</select>
+    <label>Question</label><input type="text" id="qText" placeholder="What is the capital of France?">
+    <label>Choice A (correct)</label><input type="text" id="qA">
+    <label>Choice B</label><input type="text" id="qB">
+    <label>Choice C</label><input type="text" id="qC">
+    <div class="error-msg" id="qAddErr"></div>
+    <button class="btn block grass" style="margin-top:14px;" onclick="submitAddQuestion()">Add Question</button>
+  `);
+}
+window.submitAddQuestion = async function(){
+  const text=$('qText').value.trim(); const a=$('qA').value.trim(), b=$('qB').value.trim(), c=$('qC').value.trim();
+  if(!text||!a){ $('qAddErr').textContent='Question and at least Choice A are required.'; return; }
+  const choices=[a,b,c].filter(Boolean);
+  await addDoc(collection(db,'families',state.familyCode,'questions'), { category:$('qCategory').value, question:text, choices, correctIndex:0 });
+  closeModal(); toast('Question added!', '❓');
+}
+window.deleteQuestion = async function(id){ await deleteDoc(doc(db,'families',state.familyCode,'questions',id)); }
+
+function adminEvents(){
+  return `
+    <div class="section-title">🎉 Events</div>
+    <button class="btn grass block" onclick="openAddEventModal()">+ Create Event</button>
+    <div style="margin-top:14px;">
+      ${state.events.length ? state.events.map(e=>`
+        <div class="card" style="margin-bottom:10px;">
+          <div style="font-weight:800;">${escapeHtml(e.name)} ${isEventActive(e)?'<span class="pill" style="background:#3FCB7833; color:var(--grass);">LIVE</span>':''}</div>
+          <div style="font-size:13px; color:var(--ink-soft); font-weight:700;">${escapeHtml(e.description||'')}</div>
+          <div style="font-size:12px; color:var(--ink-soft); margin-top:4px;">${e.startDate||'?'} → ${e.endDate||'?'}</div>
+          <button class="btn small coral" style="margin-top:8px;" onclick="deleteEvent('${e.id}')">Delete</button>
+        </div>`).join('') : `<div class="empty-state"><span class="em">🎉</span>No events yet.</div>`}
+    </div>
+  `;
+}
+window.openAddEventModal = function(){
+  openModal(`
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <h2>Create Event</h2>
+    <label>Event Name</label><input type="text" id="evName" placeholder="Summer Bonus Week">
+    <label>Description</label><input type="text" id="evDesc" placeholder="Double coins all week!">
+    <div class="form-row">
+      <div><label>Start Date</label><input type="date" id="evStart"></div>
+      <div><label>End Date</label><input type="date" id="evEnd"></div>
+    </div>
+    <button class="btn block grass" style="margin-top:14px;" onclick="submitAddEvent()">Create Event</button>
+  `);
+}
+window.submitAddEvent = async function(){
+  const name=$('evName').value.trim(); if(!name) return;
+  await addDoc(collection(db,'families',state.familyCode,'events'), {
+    name, description:$('evDesc').value.trim(), startDate:$('evStart').value, endDate:$('evEnd').value,
+  });
+  closeModal(); toast('Event created!', '🎉');
+}
+window.deleteEvent = async function(id){ await deleteDoc(doc(db,'families',state.familyCode,'events',id)); }
+
+function adminReports(){
+  return `
+    <div class="section-title">📈 Reports</div>
+    <table class="admin-table">
+      <tr><th>Kid</th><th>Level</th><th>Quests Done</th><th>Coins Earned</th><th>Streak</th></tr>
+      ${state.children.map(k=>`<tr>
+        <td>${escapeHtml(k.name||k.username)}</td>
+        <td>${levelFromXp(k.xp||0)}</td>
+        <td>${(k.stats&&k.stats.questsCompleted)||0}</td>
+        <td>${(k.stats&&k.stats.lifetimeCoins)||0}</td>
+        <td>${(k.stats&&k.stats.loginStreak)||0} 🔥</td>
+      </tr>`).join('') || `<tr><td colspan="5" style="text-align:center; padding:20px;">No data yet.</td></tr>`}
+    </table>
+  `;
+}
+
+function adminSettings(){
+  return `
+    <div class="section-title">⚙️ Settings</div>
+    <div class="card">
+      <div style="font-weight:800; margin-bottom:6px;">Family Code</div>
+      <div style="font-family:'Baloo 2',cursive; font-size:26px; letter-spacing:4px; color:var(--violet);">${state.familyCode}</div>
+    </div>
+    <button class="btn block ghost" style="margin-top:14px;" onclick="adminSignOut()">Sign Out</button>
+  `;
+}
+
+/* ===================================================================
+   INIT
+   =================================================================== */
+showScreen('screen-login');
+</script>
+</body>
+</html>
